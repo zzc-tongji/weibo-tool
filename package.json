@@ -1,0 +1,20 @@
+{
+  "name": "weibo-tool",
+  "version": "1.0.0",
+  "scripts": {
+    "eslint": "eslint --fix ."
+  },
+  "type": "module",
+  "repository": "https://github.com/zzc-tongji/xhs-tool",
+  "author": "Zhicheng Zhang <20331014+zzc-tongji@users.noreply.github.com>",
+  "devDependencies": {
+    "eslint": "^8.47.0"
+  },
+  "dependencies": {
+    "argparse": "^2.0.1",
+    "check-types": "^11.2.3",
+    "puppeteer": "^23.2.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}
