@@ -93,7 +93,7 @@ const main = async () => {
   // eslint-disable-next-line no-cond-assign
   if (temp = /weibo.com\/u\/page\/(fav|like)\/(.*)$/.exec(scrapeOption.feedUrl)) {
     outputFileName = `data.weibo.${temp[2]}.${temp[1]}`;
-  // eslint-disable-next-line no-cond-assign
+    // eslint-disable-next-line no-cond-assign
   } else if (temp = /weibo.com\/u\/(.*)$/.exec(scrapeOption.feedUrl)) {
     outputFileName = `data.weibo.${temp[1]}.post`;
   }
@@ -147,11 +147,19 @@ const main = async () => {
     const responseBody = await response.json();
     const x = responseBody?.data?.list || responseBody?.data?.status || responseBody?.statuses || [];
     if (x.length <= 0) {
-      console.log(`main | fail to handle url [${response.url()}] with response ${JSON.stringify(responseBody)}`);
+      console.log(`main | empty list | url [${response.url()}] | response ${JSON.stringify(responseBody)}`);
       finishCallback();
       return;
     }
     x.map((p) => {
+      if (!p?.idstr) {
+        return;
+      }
+      if (!p?.user?.idstr) {
+        // 27004 - mobile only
+        postUrlMap[p.idstr] = `https://m.weibo.cn/status/${p.idstr}`;
+        return;
+      }
       postUrlMap[p.idstr] = `https://www.weibo.com/${p.user.idstr}/${p.idstr}`;
     });
     postUrlMapLength = Object.keys(postUrlMap).length;
@@ -166,15 +174,16 @@ const main = async () => {
   //
   // go to feed page
   //
+  if (responseTimer) {
+    clearTimeout(responseTimer);
+  }
+  responseTimer = setTimeout(finishCallback, scrapeOption.maxFetchIntervalMs);
+  //
   await page.goto(scrapeOption.feedUrl, { waitUntil: 'networkidle2', timeout: 60000 });
   console.log(`main | page [${scrapeOption.feedUrl}] loaded for user [${userId}]`);
   //
   // [BEGIN] start scroll on feed page
   //
-  if (responseTimer) {
-    clearTimeout(responseTimer);
-  }
-  responseTimer = setTimeout(finishCallback, scrapeOption.maxFetchIntervalMs);
   page.evaluate(async (_scrapeOption) => {
     // [SCROLL] trigger page event 'response'
     window._random = (center, offset) => {

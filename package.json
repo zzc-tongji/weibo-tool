@@ -2,7 +2,8 @@
   "name": "weibo-tool",
   "version": "1.0.0",
   "scripts": {
-    "eslint": "eslint --fix ."
+    "eslint": "eslint --fix .",
+    "scrape": "node src/scrape.js"
   },
   "type": "module",
   "repository": "https://github.com/zzc-tongji/xhs-tool",
