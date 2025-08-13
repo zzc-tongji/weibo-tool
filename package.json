@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "eslint": "eslint --fix .",
-    "scrape": "node src/scrape.js"
+    "scrape": "node src/scrape.js",
+    "interact": "node src/interact.js",
+    "summarize": "node src/summarize.js"
   },
   "type": "module",
   "repository": "https://github.com/zzc-tongji/xhs-tool",

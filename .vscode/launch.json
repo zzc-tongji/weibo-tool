@@ -12,6 +12,24 @@
       "args": [
         "--wkdir=${workspaceFolder}\\wkdir"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Weibo Interactor",
+      "program": "${workspaceFolder}\\src\\interact.js",
+      "args": [
+        "--wkdir=${workspaceFolder}\\wkdir"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Weibo Summary",
+      "program": "${workspaceFolder}\\src\\summary.js",
+      "args": [
+        "--wkdir=${workspaceFolder}\\wkdir"
+      ]
     }
   ]
 }
