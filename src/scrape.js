@@ -152,7 +152,7 @@ const main = async () => {
       return;
     }
     x.map((p) => {
-      postUrlMap[p.idstr] = `https://www.weibo.com/${p.idstr}/${p.user.idstr}`;
+      postUrlMap[p.idstr] = `https://www.weibo.com/${p.user.idstr}/${p.idstr}`;
     });
     postUrlMapLength = Object.keys(postUrlMap).length;
     process.stdout.write(`main | [${postUrlMapLength}] post(s) scraped\r`);

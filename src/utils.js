@@ -30,7 +30,7 @@ const waitForUserLogin = async ({ page, pollingTimeMs }) => {
   }
   const userId = re.exec(userPageUrl)[1];
   console.log(`waitForUserLogin | login as user [${userId}]                                 `);
-  const cookieParam = (await page.cookies()).filter((c) => c.domain.endsWith('weibo.com') || c.domain.endsWith('sina.com.cn'));
+  const cookieParam = (await page.cookies()).filter((c) => c.domain.endsWith('weibo.com'));
   return { userId, cookieParam, cookieHeader: cookieParam.map((c) => `${c.name}=${c.value}`).join('; ') };
 };
 
