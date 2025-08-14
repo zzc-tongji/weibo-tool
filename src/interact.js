@@ -86,6 +86,49 @@ const main = async () => {
     const url = interactOption.list[i];
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
     await sleep(random(interactOption.loadTimeMs, interactOption.loadTimeMsOffset));
+    if (/^https:\/\/m.weibo.cn\/status\/([0-9A-Za-z]+)$/.test(url)) {
+      // like
+      let l = false;
+      if (interactOption.like !== 0) {
+        const likeElement = await page.$('i.lite-iconf-like');
+        if (likeElement) {
+          l = (interactOption.like * ((await page.$('i.lite-iconf-liked')) ? 1 : -1) < 0);
+          if (l) {
+            await likeElement.click();
+            await sleep(random(interactOption.likeTimeMs, interactOption.likeTimeMsOffset));
+            console.log(`main | ${interactOption.like > 0 ? '❤️ ' : '🤍'} [${i + 1}/${interactOption.list.length}] ${url} | ${interactOption.like > 0 ? 'LIKE' : 'DIS-LIKE'}`);
+          }
+        } else {
+          console.log(`main | ❌ [${i + 1}/${interactOption.list.length}] ${url} | element [like] not found`);
+          break;
+        }
+      }
+      // collect
+      let c = false;
+      if (interactOption.collect !== 0) {
+        const moreElement = await page.$('i.m-font-dot-more');
+        if (moreElement) {
+          await moreElement.click();
+          await sleep(random(interactOption.collectTimeMs, interactOption.collectTimeMsOffset));
+          const collectElement = await page.$('ul.m-wpbtn-list>li:nth-child(1)');
+          if (interactOption.collect > 0) {
+            await collectElement.click();
+            await sleep(random(interactOption.collectTimeMs, interactOption.collectTimeMsOffset));
+            console.log(`main | ⭐ [${i + 1}/${interactOption.list.length}] ${url} | COLLECT`);
+          } else { // interactOption.collect < 0
+            console.log(`main | ❌ [${i + 1}/${interactOption.list.length}] ${url} | not able to dis-collect`);
+          }
+        } else {
+          console.log(`main | ❌ [${i + 1}/${interactOption.list.length}] ${url} | element [collect] not found`);
+          break;
+        }
+      }
+      //
+      if (!l && !c) {
+        console.log(`main | ☑️  [${i + 1}/${interactOption.list.length}] ${url} | SKIP`);
+      }
+      continue;
+    }
     // article
     const article = await page.$('article');
     if (!article) {
@@ -93,32 +136,38 @@ const main = async () => {
       break;
     }
     // like
-    const likeElement = await page.$('article button.woo-like-main');
-    if (!likeElement) {
-      console.log(`main | ❌ [${i + 1}/${interactOption.list.length}] ${url} | element [like] not found`);
-      break;
-    }
-    const l = (interactOption.like * ((await page.$('article button.woo-like-main span.woo-like-liked')) ? 1 : -1) < 0);
-    if (l) {
-      await likeElement.click();
-      await sleep(random(interactOption.likeTimeMs, interactOption.likeTimeMsOffset));
-      console.log(`main | ${interactOption.like > 0 ? '❤️ ' : '🤍'} [${i + 1}/${interactOption.list.length}] ${url} | ${interactOption.like > 0 ? 'LIKE' : 'DIS-LIKE'}`);
+    let l = false;
+    if (interactOption.like !== 0) {
+      const likeElement = await page.$('article button.woo-like-main');
+      if (!likeElement) {
+        console.log(`main | ❌ [${i + 1}/${interactOption.list.length}] ${url} | element [like] not found`);
+        break;
+      }
+      l = (interactOption.like * ((await page.$('article button.woo-like-main span.woo-like-liked')) ? 1 : -1) < 0);
+      if (l) {
+        await likeElement.click();
+        await sleep(random(interactOption.likeTimeMs, interactOption.likeTimeMsOffset));
+        console.log(`main | ${interactOption.like > 0 ? '❤️ ' : '🤍'} [${i + 1}/${interactOption.list.length}] ${url} | ${interactOption.like > 0 ? 'LIKE' : 'DIS-LIKE'}`);
+      }
     }
     // collect
-    const moreElement = await page.$('article i[title="更多"]');
-    if (!moreElement) {
-      console.log(`main | ❌ [${i + 1}/${interactOption.list.length}] ${url} | element [collect] not found`);
-      break;
-    }
-    await moreElement.click();
-    await sleep(random(interactOption.collectTimeMs, interactOption.collectTimeMsOffset));
-    const collectElement = await page.$('article div.woo-pop-wrap-main>div:nth-child(2)');
-    const collected = (await page.evaluate(el => el.textContent, collectElement)) === '取消收藏';
-    const c = (interactOption.collect * (collected ? 1 : -1) < 0);
-    if (c) {
-      await collectElement.click();
-      await sleep(random(interactOption.collectTimeMs, interactOption.collectTimeMsOffset));
-      console.log(`main | ${interactOption.collect > 0 ? '⭐' : '🔲'} [${i + 1}/${interactOption.list.length}] ${url} | ${interactOption.collect > 0 ? 'COLLECT' : 'DIS-COLLECT'}`);
+    let c = false;
+    if (interactOption.collect !== 0) {
+      const moreElement = await page.$('article i[title="更多"]');
+      if (moreElement) {
+        await moreElement.click();
+        await sleep(random(interactOption.collectTimeMs, interactOption.collectTimeMsOffset));
+        const collectElement = await page.$('article div.woo-pop-wrap-main>div:nth-child(2)');
+        const collected = ((await page.evaluate(el => el.textContent, collectElement)) === '取消收藏');
+        c = (interactOption.collect * (collected ? 1 : -1) < 0);
+        if (c) {
+          await collectElement.click();
+          await sleep(random(interactOption.collectTimeMs, interactOption.collectTimeMsOffset));
+          console.log(`main | ${interactOption.collect > 0 ? '⭐' : '🔲'} [${i + 1}/${interactOption.list.length}] ${url} | ${interactOption.collect > 0 ? 'COLLECT' : 'DIS-COLLECT'}`);
+        }
+      } else {
+        console.log(`main | ❌ [${i + 1}/${interactOption.list.length}] ${url} | element [collect] not found`);
+      }
     }
     //
     if (!l && !c) {
