@@ -26,7 +26,7 @@
       "type": "node",
       "request": "launch",
       "name": "Weibo Summary",
-      "program": "${workspaceFolder}\\src\\summary.js",
+      "program": "${workspaceFolder}\\src\\summarize.js",
       "args": [
         "--wkdir=${workspaceFolder}\\wkdir"
       ]

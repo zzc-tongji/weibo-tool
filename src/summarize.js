@@ -50,6 +50,8 @@ const summaryCsv = 'ID,URL,Liked,Collection,Eagle\n' + Object.keys(summary).map(
 fs.writeFileSync(path.resolve(argv.wkdir, 'summary.weibo.csv'), summaryCsv, { encoding: 'utf-8' });
 //
 const likedButNotCollection = Object.values(summary).filter(v => v.liked && !v.collection).map(v => v.url).join('\n');
-fs.writeFileSync(path.resolve(argv.wkdir, 'summary.weibo.liked-but-not-collection.txt'), likedButNotCollection, { encoding: 'utf-8' });
+fs.writeFileSync(path.resolve(argv.wkdir, 'summary.weibo.liked-but-not-collected.txt'), likedButNotCollection, { encoding: 'utf-8' });
+const collectionButNotLiked = Object.values(summary).filter(v => !v.liked && v.collection).map(v => v.url).join('\n');
+fs.writeFileSync(path.resolve(argv.wkdir, 'summary.weibo.collected-but-not-liked.txt'), collectionButNotLiked, { encoding: 'utf-8' });
 //
 console.log('done');
