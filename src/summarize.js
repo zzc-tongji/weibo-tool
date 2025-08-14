@@ -49,9 +49,9 @@ fs.writeFileSync(path.resolve(argv.wkdir, 'summary.weibo.json'), JSON.stringify(
 const summaryCsv = 'ID,URL,Liked,Collection,Eagle\n' + Object.keys(summary).map(key => `${key},${summary[key].url},${summary[key].liked || false},${summary[key].collection || false},${summary[key].eagle || false}`).join('\n');
 fs.writeFileSync(path.resolve(argv.wkdir, 'summary.weibo.csv'), summaryCsv, { encoding: 'utf-8' });
 //
-const likedButNotCollection = Object.values(summary).filter(v => v.liked && !v.collection).map(v => v.url).join('\n');
-fs.writeFileSync(path.resolve(argv.wkdir, 'summary.weibo.liked-but-not-collected.txt'), likedButNotCollection, { encoding: 'utf-8' });
-const collectionButNotLiked = Object.values(summary).filter(v => !v.liked && v.collection).map(v => v.url).join('\n');
-fs.writeFileSync(path.resolve(argv.wkdir, 'summary.weibo.collected-but-not-liked.txt'), collectionButNotLiked, { encoding: 'utf-8' });
+const likedButNotCollected = Object.values(summary).filter(v => v.liked && !v.collection).map(v => v.url).join('\n');
+fs.writeFileSync(path.resolve(argv.wkdir, 'summary.weibo.liked-but-not-collected.txt'), likedButNotCollected, { encoding: 'utf-8' });
+const collectedButNotLiked = Object.values(summary).filter(v => !v.liked && v.collection).map(v => v.url).join('\n');
+fs.writeFileSync(path.resolve(argv.wkdir, 'summary.weibo.collected-but-not-liked.txt'), collectedButNotLiked, { encoding: 'utf-8' });
 //
 console.log('done');
