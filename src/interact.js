@@ -156,7 +156,15 @@ const main = async () => {
       l = (interactOption.like * ((await page.$('article button.woo-like-main span.woo-like-liked')) ? 1 : -1) < 0);
       if (l) {
         await likeElement.click();
-        await sleep(random(interactOption.likeTimeMs, interactOption.likeTimeMsOffset));
+        //
+        await sleep(500);
+        const toastText = ((await page.$('div.woo-toast-body>span')) && (await page.$eval('div.woo-toast-body>span', el => el.innerText))) || '';
+        if (/操作频繁/.test(toastText)) {
+          process.stdout.write('main | like operation too frequency | continue after for 300 second(s)\r');
+          await sleep(300000);
+        }
+        //
+        await sleep(random(interactOption.likeTimeMs - 500, interactOption.likeTimeMsOffset));
         //
         let captchaStyle = (await page.$('div.geetest_box_wrap')) && (await page.$eval('div.geetest_box_wrap', getStyleObject));
         if (captchaStyle && captchaStyle.display !== 'none') {
