@@ -147,7 +147,22 @@ const main = async () => {
       if (l) {
         await likeElement.click();
         await sleep(random(interactOption.likeTimeMs, interactOption.likeTimeMsOffset));
-        console.log(`main | ${interactOption.like > 0 ? '❤️ ' : '🤍'} [${i + 1}/${interactOption.list.length}] ${url} | ${interactOption.like > 0 ? 'LIKE' : 'DIS-LIKE'}`);
+        //
+        let captcha = await page.$('div.geetest_captcha');
+        if (captcha) {
+          // human verification
+          if (interactOption.skipHumanVerification) {
+            console.log(`main | ❌ [${i + 1}/${interactOption.list.length}] ${url} | human verification`);
+          } else {
+            do {
+              process.stdout.write('main | please pass human verification | polling after 10 second(s)\r');
+              await sleep(10000);
+            } while ((captcha = await page.$('div.geetest_captcha')));
+            console.log(`main | ${interactOption.like > 0 ? '❤️ ' : '🤍'} [${i + 1}/${interactOption.list.length}] ${url} | ${interactOption.like > 0 ? 'LIKE' : 'DIS-LIKE'}`);
+          }
+        } else {
+          console.log(`main | ${interactOption.like > 0 ? '❤️ ' : '🤍'} [${i + 1}/${interactOption.list.length}] ${url} | ${interactOption.like > 0 ? 'LIKE' : 'DIS-LIKE'}`);
+        }
       }
     }
     // collect
@@ -163,7 +178,21 @@ const main = async () => {
         if (c) {
           await collectElement.click();
           await sleep(random(interactOption.collectTimeMs, interactOption.collectTimeMsOffset));
-          console.log(`main | ${interactOption.collect > 0 ? '⭐' : '🔲'} [${i + 1}/${interactOption.list.length}] ${url} | ${interactOption.collect > 0 ? 'COLLECT' : 'DIS-COLLECT'}`);
+          // human verification
+          let captcha = await page.$('div.geetest_captcha');
+          if (captcha) {
+            if (interactOption.skipHumanVerification) {
+              console.log(`main | ❌ [${i + 1}/${interactOption.list.length}] ${url} | human verification`);
+            } else {
+              do {
+                process.stdout.write('main | please pass human verification | polling after 10 second(s)\r');
+                await sleep(10000);
+              } while ((captcha = await page.$('div.geetest_captcha')));
+              console.log(`main | ${interactOption.collect > 0 ? '⭐' : '🔲'} [${i + 1}/${interactOption.list.length}] ${url} | ${interactOption.collect > 0 ? 'COLLECT' : 'DIS-COLLECT'}`);
+            }
+          } else {
+            console.log(`main | ${interactOption.collect > 0 ? '⭐' : '🔲'} [${i + 1}/${interactOption.list.length}] ${url} | ${interactOption.collect > 0 ? 'COLLECT' : 'DIS-COLLECT'}`);
+          }
         }
       } else {
         console.log(`main | ❌ [${i + 1}/${interactOption.list.length}] ${url} | element [collect] not found`);
