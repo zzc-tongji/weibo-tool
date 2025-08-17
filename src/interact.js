@@ -82,6 +82,16 @@ const main = async () => {
   fs.writeFileSync(path.resolve(allConfig.runtime.wkdir, 'cookie.weibo.json'), JSON.stringify(cookieParam, null, 2), { encoding: 'utf-8' });
   fs.writeFileSync(path.resolve(allConfig.runtime.wkdir, 'cookie.weibo.header.txt'), cookieHeader, { encoding: 'utf-8' });
   //
+  const getStyleObject = (el) => {
+    const styles = window.getComputedStyle(el);
+    const styleObject = {};
+    for (let i = 0; i < styles.length; i++) {
+      const propertyName = styles[i];
+      styleObject[propertyName] = styles.getPropertyValue(propertyName);
+    }
+    return styleObject;
+  };
+  //
   for (let i = 0; i < interactOption.list.length; i++) {
     const url = interactOption.list[i];
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
@@ -148,8 +158,8 @@ const main = async () => {
         await likeElement.click();
         await sleep(random(interactOption.likeTimeMs, interactOption.likeTimeMsOffset));
         //
-        let captcha = await page.$('div.geetest_captcha');
-        if (captcha) {
+        let captchaStyle = (await page.$('div.geetest_box_wrap')) && (await page.$eval('div.geetest_box_wrap', getStyleObject));
+        if (captchaStyle && captchaStyle.display !== 'none') {
           // human verification
           if (interactOption.skipHumanVerification) {
             console.log(`main | ❌ [${i + 1}/${interactOption.list.length}] ${url} | human verification`);
@@ -157,7 +167,9 @@ const main = async () => {
             do {
               process.stdout.write('main | please pass human verification | polling after 10 second(s)\r');
               await sleep(10000);
-            } while ((captcha = await page.$('div.geetest_captcha')));
+              //
+              captchaStyle = captchaStyle = (await page.$('div.geetest_box_wrap')) && (await page.$eval('div.geetest_box_wrap', getStyleObject));
+            } while (captchaStyle && captchaStyle.display !== 'none');
             console.log(`main | ${interactOption.like > 0 ? '❤️ ' : '🤍'} [${i + 1}/${interactOption.list.length}] ${url} | ${interactOption.like > 0 ? 'LIKE' : 'DIS-LIKE'}`);
           }
         } else {
@@ -179,15 +191,17 @@ const main = async () => {
           await collectElement.click();
           await sleep(random(interactOption.collectTimeMs, interactOption.collectTimeMsOffset));
           // human verification
-          let captcha = await page.$('div.geetest_captcha');
-          if (captcha) {
+          let captchaStyle = (await page.$('div.geetest_box_wrap')) && (await page.$eval('div.geetest_box_wrap', getStyleObject));
+          if (captchaStyle && captchaStyle.display !== 'none') {
             if (interactOption.skipHumanVerification) {
               console.log(`main | ❌ [${i + 1}/${interactOption.list.length}] ${url} | human verification`);
             } else {
               do {
                 process.stdout.write('main | please pass human verification | polling after 10 second(s)\r');
                 await sleep(10000);
-              } while ((captcha = await page.$('div.geetest_captcha')));
+                //
+                captchaStyle = captchaStyle = (await page.$('div.geetest_box_wrap')) && (await page.$eval('div.geetest_box_wrap', getStyleObject));
+              } while (captchaStyle && captchaStyle.display !== 'none');
               console.log(`main | ${interactOption.collect > 0 ? '⭐' : '🔲'} [${i + 1}/${interactOption.list.length}] ${url} | ${interactOption.collect > 0 ? 'COLLECT' : 'DIS-COLLECT'}`);
             }
           } else {
