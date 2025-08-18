@@ -73,7 +73,7 @@ const main = async () => {
   //
   puppeteer.use(Stealth());
   const browser = await puppeteer.launch(browserOption);
-  const page = (await browser.pages())[0] || await browser.newPage();
+  const page = await browser.newPage();
   await page.goto('https://weibo.com/', { waitUntil: 'networkidle2', timeout: 60000 });
   //
   // login and save cookie
@@ -236,6 +236,7 @@ const main = async () => {
     }
   }
   console.log('main | done');
+  await page.close();
   await browser.close();
 };
 

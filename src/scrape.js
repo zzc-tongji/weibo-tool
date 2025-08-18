@@ -69,7 +69,7 @@ const main = async () => {
   //
   puppeteer.use(Stealth());
   const browser = await puppeteer.launch(browserOption);
-  const page = (await browser.pages())[0] || await browser.newPage();
+  const page = await browser.newPage();
   await page.goto('https://weibo.com/', { waitUntil: 'networkidle2', timeout: 60000 });
   //
   // login and save cookie
@@ -127,8 +127,8 @@ const main = async () => {
       console.log(`main | data locates at [${txt}]`);
       //
       console.log('main | done');
-      return browser.close();
-    }).then(() => process.exit(0));
+      return page.close();
+    }).then(() => browser.close()).then(() => process.exit(0));
   };
   page.on('response', async (response) => {
     // [SCROLL] handle page event 'response'
