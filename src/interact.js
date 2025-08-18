@@ -92,6 +92,8 @@ const main = async () => {
     return styleObject;
   };
   //
+  let likeWaitParam = 0;
+  //
   for (let i = 0; i < interactOption.list.length; i++) {
     const url = interactOption.list[i];
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
@@ -100,9 +102,9 @@ const main = async () => {
       // like
       let l = false;
       if (interactOption.like !== 0) {
-        const likeElement = await page.$('i.lite-iconf-like');
+        const likeElement = await page.$('div.lite-page-editor i.lite-iconf-like');
         if (likeElement) {
-          l = (interactOption.like * ((await page.$('i.lite-iconf-liked')) ? 1 : -1) < 0);
+          l = (interactOption.like * ((await page.$('div.lite-page-editor i.lite-iconf-liked')) ? 1 : -1) < 0);
           if (l) {
             await likeElement.click();
             await sleep(random(interactOption.likeTimeMs, interactOption.likeTimeMsOffset));
@@ -155,14 +157,22 @@ const main = async () => {
       }
       l = (interactOption.like * ((await page.$('article button.woo-like-main span.woo-like-liked')) ? 1 : -1) < 0);
       if (l) {
-        await likeElement.click();
         //
-        await sleep(500);
-        const toastText = ((await page.$('div.woo-toast-body>span')) && (await page.$eval('div.woo-toast-body>span', el => el.innerText))) || '';
-        if (/操作频繁/.test(toastText)) {
-          process.stdout.write('main | like operation too frequency | continue after for 300 second(s)\r');
-          await sleep(300000);
+        if (likeWaitParam > 0) {
+          await sleep(likeWaitParam * 60000);
         }
+        //
+        await likeElement.click();
+        await sleep(500);
+        while (/操作频繁/.test(((await page.$('div.woo-toast-body>span')) && (await page.$eval('div.woo-toast-body>span', el => el.innerText))) || '')) {
+          likeWaitParam += 2;
+          console.log(`main | like operation too frequently | continue after ${likeWaitParam} minute(s)`);
+          await sleep(likeWaitParam * 60000);
+          //
+          await likeElement.click();
+          await sleep(500);
+        }
+        likeWaitParam = Math.max(likeElement - 2, 0);
         //
         await sleep(random(interactOption.likeTimeMs - 500, interactOption.likeTimeMsOffset));
         //
